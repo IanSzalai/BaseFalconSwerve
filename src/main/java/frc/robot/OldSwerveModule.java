@@ -10,6 +10,7 @@ import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.wpilibj.AnalogPotentiometer;
 import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.motorcontrol.VictorSP;
+import frc.lib.util.CTREModuleState;
 import frc.lib.util.OldSwerveModuleConstants;
 
 /**
@@ -20,18 +21,14 @@ import frc.lib.util.OldSwerveModuleConstants;
 public class OldSwerveModule {
     public int moduleNumber;
     private Rotation2d absoluteAngleOffset;
-    private Rotation2d relativeAngleOffset;
     private Rotation2d lastAngle;
 
     private VictorSP mAngleMotor;
     private VictorSP mDriveMotor;
     private AnalogPotentiometer absoluteAngleEncoder;
-    private Encoder relativeAngleEncoder;
-
-    private double relativeAngleEncoderCountsPerWheelRotation;
+    private Encoder driveEncoder;
 
     private PIDController anglePID;
-    private double anglePIDTolerance;
 
     public OldSwerveModule(int moduleNumber, OldSwerveModuleConstants moduleConstants) {
         this.moduleNumber = moduleNumber;
@@ -39,16 +36,11 @@ public class OldSwerveModule {
 
         /* Angle Encoders Config */
         absoluteAngleEncoder = new AnalogPotentiometer(
-                moduleConstants.absoluteAngleEncoderAnalog, 360, 0);
-        relativeAngleEncoder = new Encoder(
-                moduleConstants.relativeAngleEncoderDIOA,
-                moduleConstants.relativeAngleEncoderDIOB,
-                moduleConstants.absoluteAngleEncoderInvert);
+                moduleConstants.absoluteAngleEncoderAnalog, 360);
         configAngleEncoders();
 
         /* Angle Motor Config */
         mAngleMotor = new VictorSP(moduleConstants.angleMotorPWM);
-        relativeAngleEncoderCountsPerWheelRotation = 1000;
         configAngleMotor();
 
         /* Angle PID Config */
@@ -56,17 +48,26 @@ public class OldSwerveModule {
                 Constants.Swerve.angleKP,
                 Constants.Swerve.angleKI,
                 Constants.Swerve.angleKD);
-        anglePIDTolerance = 0.5;
         configAnglePID();
 
         /* Drive Motor Config */
         mDriveMotor = new VictorSP(moduleConstants.driveMotorPWM);
         configDriveMotor();
 
+        /* Drive Encoder Config */
+        driveEncoder = new Encoder(
+                moduleConstants.driveEncoderDIOA,
+                moduleConstants.driveEncoderDIOB,
+                moduleConstants.driveEncoderInvert);
+        configDriveEncoder();
+
+        lastAngle = getAngle();
+
     }
 
     public void setDesiredState(SwerveModuleState desiredState) {
-        SwerveModuleState state = SwerveModuleState.optimize(desiredState, getAngle());
+        SwerveModuleState state = CTREModuleState.optimize(desiredState, getAngle());
+        // SwerveModuleState state = desiredState;
         setAngle(state);
         setSpeed(state);
     }
@@ -85,24 +86,32 @@ public class OldSwerveModule {
         double percentOutput = anglePID.calculate(getAngle().getDegrees(), angle.getDegrees());
 
         mAngleMotor.set(percentOutput);
+        lastAngle = angle;
     }
 
-    private Rotation2d getAngle() {
-        return Rotation2d.fromDegrees(relativeAngleEncoder.getDistance() - relativeAngleOffset.getDegrees());
+    public Rotation2d getAngle() {
+        double degrees = absoluteAngleEncoder.get() - absoluteAngleOffset.getDegrees();
+        return Rotation2d.fromDegrees(degrees);
     }
 
-    private Rotation2d getAbsoluteEncoder() {
-        return Rotation2d.fromDegrees(absoluteAngleEncoder.get());
+    public double getRawAbsoluteEncoder() {
+        return absoluteAngleEncoder.get();
     }
 
-    public void resetToAbsolute() {
-        double absolutePosition = getAbsoluteEncoder().getDegrees() - absoluteAngleOffset.getDegrees();
-        relativeAngleEncoder.reset();
-        relativeAngleOffset = Rotation2d.fromDegrees(absolutePosition);
+    public double getRawDriveEncoder() {
+        return driveEncoder.getRaw();
+    }
+
+    public double getAnglePIDSetpoint() {
+        return anglePID.getSetpoint();
+    }
+
+    public double getAnglePIDError() {
+        return anglePID.getPositionError();
     }
 
     private void configAngleEncoders() {
-        relativeAngleEncoder.setDistancePerPulse(relativeAngleEncoderCountsPerWheelRotation / 360);
+        // no config needed
     }
 
     private void configAngleMotor() {
@@ -112,11 +121,15 @@ public class OldSwerveModule {
 
     private void configAnglePID() {
         anglePID.enableContinuousInput(-180, 180);
-        anglePID.setTolerance(anglePIDTolerance);
     }
 
     private void configDriveMotor() {
         mDriveMotor.setInverted(Constants.Swerve.driveMotorInvert);
         mDriveMotor.setSafetyEnabled(false);
+    }
+
+    private void configDriveEncoder() {
+        driveEncoder.reset();
+        // driveEncoder.setDistancePerPulse(something);
     }
 }

@@ -7,9 +7,9 @@ public class OldSwerveModuleConstants {
     public final int angleMotorPWM;
     public final int absoluteAngleEncoderAnalog;
     public final boolean absoluteAngleEncoderInvert;
-    public final int relativeAngleEncoderDIOA;
-    public final int relativeAngleEncoderDIOB;
-    public final boolean relativeAngleEncoderInvert;
+    public final int driveEncoderDIOA;
+    public final int driveEncoderDIOB;
+    public final boolean driveEncoderInvert;
     public final Rotation2d angleOffset;
 
     /**
@@ -22,11 +22,11 @@ public class OldSwerveModuleConstants {
      * @param absoluteAngleEncoderAnalog Analog port on the roboRIO the absolute
      *                                   analog angle encoder is plugged in to
      * @param absoluteAngleEncoderInvert Is the absolute encoder inverted
-     * @param relativeAngleEncoderDIOA   DIO port that the first channel of the
-     *                                   relative angle encoder is plugged in to
-     * @param relativeAngleEncoderDIOB   DIO port that the second channel of the
-     *                                   relative angle encoder is plugged in to
-     * @param relativeAngleEncoderInvert Is the relative encoder inverted
+     * @param driveEncoderDIOA           DIO port that the first channel of the
+     *                                   drive encoder is plugged in to
+     * @param driveEncoderDIOB           DIO port that the second channel of the
+     *                                   drive encoder is plugged in to
+     * @param driveEncoderInvert         Is the drive encoder inverted
      * @param angleOffset                Angle that the absolute encoder reads when
      *                                   the physical wheel has an angle of zero
      */
@@ -35,17 +35,17 @@ public class OldSwerveModuleConstants {
             int angleMotorPWM,
             int absoluteAngleEncoderAnalog,
             boolean absoluteAngleEncoderInvert,
-            int relativeAngleEncoderDIOA,
-            int relativeAngleEncoderDIOB,
-            boolean relativeAngleEncoderInvert,
+            int driveEncoderDIOA,
+            int driveEncoderDIOB,
+            boolean driveEncoderInvert,
             Rotation2d angleOffset) {
         this.driveMotorPWM = driveMotorPWM;
         this.angleMotorPWM = angleMotorPWM;
         this.absoluteAngleEncoderAnalog = absoluteAngleEncoderAnalog;
         this.absoluteAngleEncoderInvert = absoluteAngleEncoderInvert;
-        this.relativeAngleEncoderDIOA = relativeAngleEncoderDIOA;
-        this.relativeAngleEncoderDIOB = relativeAngleEncoderDIOB;
-        this.relativeAngleEncoderInvert = relativeAngleEncoderInvert;
+        this.driveEncoderDIOA = driveEncoderDIOA;
+        this.driveEncoderDIOB = driveEncoderDIOB;
+        this.driveEncoderInvert = driveEncoderInvert;
         this.angleOffset = angleOffset;
     }
 
