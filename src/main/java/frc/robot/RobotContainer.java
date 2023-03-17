@@ -20,6 +20,11 @@ import frc.robot.subsystems.*;
  * subsystems, commands, and button mappings) should be declared here.
  */
 public class RobotContainer {
+
+    // TODO: change team numbers. All team numbers are set to 3255 currently, and
+    // all team numbers must be the same in all places (robot code, radio, roboRIO,
+    // drivers station) for it to work.
+
     /* Controllers */
     private final Joystick driver = new Joystick(0);
 
