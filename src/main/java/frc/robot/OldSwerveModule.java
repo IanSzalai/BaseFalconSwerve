@@ -4,13 +4,13 @@
 
 package frc.robot;
 
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.wpilibj.AnalogPotentiometer;
 import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.motorcontrol.VictorSP;
-import frc.lib.util.CTREModuleState;
 import frc.lib.util.OldSwerveModuleConstants;
 
 /**
@@ -35,8 +35,7 @@ public class OldSwerveModule {
         this.absoluteAngleOffset = moduleConstants.angleOffset;
 
         /* Angle Encoders Config */
-        absoluteAngleEncoder = new AnalogPotentiometer(
-                moduleConstants.absoluteAngleEncoderAnalog, 360);
+        absoluteAngleEncoder = new AnalogPotentiometer(moduleConstants.absoluteAngleEncoderAnalog, 360);
         configAngleEncoders();
 
         /* Angle Motor Config */
@@ -65,9 +64,8 @@ public class OldSwerveModule {
 
     }
 
-    public void setDesiredState(SwerveModuleState desiredState) {
-        SwerveModuleState state = CTREModuleState.optimize(desiredState, getAngle());
-        // SwerveModuleState state = desiredState;
+    public void setDesiredState(SwerveModuleState desiredState, boolean isOpenLoop) {
+        SwerveModuleState state = SwerveModuleState.optimize(desiredState, getAngle());
         setAngle(state);
         setSpeed(state);
     }
@@ -85,12 +83,16 @@ public class OldSwerveModule {
 
         double percentOutput = anglePID.calculate(getAngle().getDegrees(), angle.getDegrees());
 
+        percentOutput = MathUtil.clamp(percentOutput, -Constants.Swerve.angleMaxPercentOutput,
+                Constants.Swerve.angleMaxPercentOutput);
+
         mAngleMotor.set(percentOutput);
         lastAngle = angle;
     }
 
     public Rotation2d getAngle() {
         double degrees = absoluteAngleEncoder.get() - absoluteAngleOffset.getDegrees();
+        degrees = MathUtil.inputModulus(degrees, -180, 180);
         return Rotation2d.fromDegrees(degrees);
     }
 

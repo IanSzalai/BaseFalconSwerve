@@ -6,7 +6,6 @@ package frc.robot.subsystems;
 
 import com.kauailabs.navx.frc.AHRS;
 
-import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
@@ -35,32 +34,41 @@ public class OldSwerve extends SubsystemBase {
   }
 
   public void drive(Translation2d translation, double rotation, boolean fieldRelative, boolean isOpenLoop) {
-    SwerveModuleState[] swerveModuleStates = Constants.Swerve.swerveKinematics.toSwerveModuleStates(
-        new ChassisSpeeds(
-            translation.getX(),
-            translation.getY(),
-            rotation));
+
+    SwerveModuleState[] swerveModuleStates;
+
+    if (fieldRelative) {
+      swerveModuleStates = Constants.Swerve.swerveKinematics
+          .toSwerveModuleStates(ChassisSpeeds.fromFieldRelativeSpeeds(
+              translation.getX(),
+              translation.getY(),
+              rotation,
+              gyro.getRotation2d()));
+    } else {
+      swerveModuleStates = Constants.Swerve.swerveKinematics.toSwerveModuleStates(
+          new ChassisSpeeds(
+              translation.getX(),
+              translation.getY(),
+              rotation));
+    }
+
     SwerveDriveKinematics.desaturateWheelSpeeds(swerveModuleStates, Constants.Swerve.maxSpeed);
 
     for (OldSwerveModule mod : mSwerveMods) {
-      mod.setDesiredState(swerveModuleStates[mod.moduleNumber]);
+      mod.setDesiredState(swerveModuleStates[mod.moduleNumber], isOpenLoop);
     }
   }
 
-  public void setModuleStates(SwerveModuleState[] desiredStates) {
+  public void setModuleStates(SwerveModuleState[] desiredStates, boolean isOpenLoop) {
     SwerveDriveKinematics.desaturateWheelSpeeds(desiredStates, Constants.Swerve.maxSpeed);
 
     for (OldSwerveModule mod : mSwerveMods) {
-      mod.setDesiredState(desiredStates[mod.moduleNumber]);
+      mod.setDesiredState(desiredStates[mod.moduleNumber], isOpenLoop);
     }
   }
 
   public void zeroGyro() {
     gyro.reset();
-  }
-
-  public void setMod0Speed(double speed) {
-    mSwerveMods[0].setDesiredState(new SwerveModuleState(speed, new Rotation2d()));
   }
 
   @Override
