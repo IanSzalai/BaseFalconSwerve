@@ -1,39 +1,8 @@
-**Note: In 2023, there was an [issue](https://github.com/Team364/BaseFalconSwerve/issues/8) that prevented this code from working with MK4i's (or any module that used inverted motors). A [fix](https://github.com/Team364/BaseFalconSwerve/issues/8#issuecomment-1384799539) has been found, tested on a real robot, and this issue is believed to have been fixed as of 1/17. If anyone experiences any further issues, please report them. Thanks**
+**Basic Swerve Code for a Swerve Module using Victor SP motor controllers, an MA3 Absolute Encoder, and a navX Gyro** </br>
+This code was ported from BaseFalconSwerve, but much of the original code was rewritten or removed.</br>
+Since this code was made for a specific unique robot, all the configuration that the original BaseFalconSwerve requires is already complete. I'm going to leave only the steps that will likely need to be done in the future. The actual steps may differ slightly because of the rewrite.
 
-# BaseFalconSwerve </br>
 
-**Basic Swerve Code for a Swerve Module using Falcon Motors, a CTRE CANCoder, and a CTRE Pigeon Gyro** </br>
-This code was designed with Swerve Drive Specialties MK3, MK4, and MK4i style modules in mind, but should be easily adaptable to other styles of modules.</br>
-
-**Setting Constants**
-----
-The following things must be adjusted to your robot and module's specific constants in the Constants.java file (all distance units must be in meters, and rotation units in radians):</br>
-These instructions are mostly followable from Step 
-1. Gyro Settings: ```pigeonID``` and ```invertGyro``` (ensure that the gyro rotation is CCW+ (Counter Clockwise Positive)
-2. ```chosenModule```: 
-<br>If you are using a COTS SDS Module (more modules will be added in the future), set the module and drive ratio you are using here. 
-<br>This will automatically set certain constants for the specific module required to function properly. 
-<br><b><u>If you are not using a COTS supported module, you should delete this variable, and fix all the errors that pop up with correct values for the module you are using</b></u>
-<br> Here is a list of the constants that will automatically be set if you are using a supported module:
-    * Wheel Circumference
-    * Angle Motor Invert
-    * Drive Motor Invert
-    * CANCoder Sensor Invert
-    * Angle Motor Gear Ratio
-    * Drive Motor Gear Ratio
-    * Angle Falcon Motor PID Values
-    
-3. ```trackWidth```: Center to Center distance of left and right modules in meters.
-4. ```wheelBase```: Center to Center distance of front and rear module wheels in meters.
-5. ```wheelCircumference```: Cirumference of the wheel (including tread) in meters. <br><b>If you are using a supported module, this value will be automatically set.</b>
-6. ```driveGearRatio```: Total gear ratio for the drive motor. <br><b>If you are using a supported module, this value will be automatically set.</b>
-7. ```angleGearRatio```: Total gear ratio for the angle motor. <br><b>If you are using a supported module, this value will be automatically set.</b>
-8. ```canCoderInvert``` and ```angleMotorInvert```: Both must be set such that they are CCW+. <br><b>If you are using a supported module, this value will be automatically set.</b>
-9. ```driveMotorInvert```: <b>If you are using a supported module, this value will be automatically set.</b>
-<br>This can always remain false, since you set your offsets in step 11 such that a positive input to the drive motor will cause the robot to drive forwards.
-<br>However this can be set to true if for some reason you prefer the bevel gears on the wheel to face one direction or another when setting offsets. See Step 11 for more information.
-
-10. ```Module Specific Constants```: set the Can Id's of the motors and CANCoders for the respective modules, see the next step for setting offsets.
 11. Setting Offsets
     * For finding the offsets, use a piece of 1x1 metal that is straight against the forks of the front and back modules (on the left and right side) to ensure that the modules are straight. 
     * Point the bevel gears of all the wheels in the same direction (either facing left or right), where a postive input to the drive motor drives the robot forward (you can use phoenix tuner to test this). If for some reason you set the offsets with the wheels backwards, you can change the ```driveMotorInvert``` value to fix.
